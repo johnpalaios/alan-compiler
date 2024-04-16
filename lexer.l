@@ -1,32 +1,10 @@
 %{
+#include "lexer.h"
+#include "parser.h"
+#include <string.h>
 #define T_eof 0
 
-#define T_proc 667
-#define T_if 668
-#define T_else 669
-#define T_while 670
-#define T_true 672
-#define T_false 672
-#define T_return 673
-
-#define T_reference 674
-
-#define T_int 675
-#define T_byte 676
-
-#define T_const 700
-#define T_id 701
-
-#define T_esc_seq 702
-#define T_const_char_esc_seq 703
-#define T_const_char 704
-#define T_const_string 705
-
-#define T_symb_op 706
-#define T_separator 707
-
 int num_lines = 0;
-//int num_chars = 0;
 
 %}
 
@@ -36,41 +14,21 @@ ESC_SEQ \\([tnr0'"]|[x][0-9a-d][0-9a-d]|\\)
 L [a-z]
 D [0-9]
 W [ \t\r]
-U [_]
-CONST_CHAR \'[ -~^\\"']\'
-CONST_ES_CHAR \'\\([tnr0'"]|[x][0-9a-d][0-9a-d]|\\)\'
+CONST_ES_CHAR \'[ -~^\\"']\'
+CONST_CHAR \'(\\([tnr0'"]|[x][0-9a-d][0-9a-d]|\\)|[ -~^\\"'])\'
 CONST_STR \"[^\n]+\"
-SYMB_OPS "="|"=="|"!="|">"|"<"|">="|"<="|"+"|"-"|"*"|"/"|"%"|"!"|"&"|"|"
+
+MATH_OPS "="|"+"|"-"|"*"|"/"|"%"
+REL_OPS "=="|"!="|">"|"<"|">="|"<="
+LOG_OPS "&"|"|"|"!"
 SEPARATORS "("|")"|"["|"]"|"{"|"}"|","|":"|";"
 L_COMMENT "--".*\n
 ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 %option noyywrap
 
 %%
-{L_COMMENT}  { ++num_lines; }
-{ML_COMMENT} {  
-				int i = 0;
-				while(yytext[i] != '\0') {
-                    char c = yytext[i]; 
-                    if (c == '\n') {
-                        ++num_lines;
-                    }
-                    if (c == ')' && yytext[i-1] == '*') {
-                        printf("End of Comment on line %d\n", num_lines); 
-                    	break;
-					}
-					i++;
-                }
-				return 1000;
-			}
 
-{CONST_ES_CHAR} { return T_const_char_esc_seq; }
-{CONST_CHAR}  	{ return T_const_char; }
-{CONST_STR}	  	{ return T_const_string; }
-{SYMB_OPS} 		{ return T_symb_op; }
-{SEPARATORS}  	{ return T_separator; }
- 
-"proc"  	{ return T_proc; }
+"proc"		{ return T_proc; }
 "if"  		{ return T_if; }
 "else"   	{ return T_else; }
 "while"    	{ return T_while; }
@@ -84,13 +42,87 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 "byte"  	{ return T_byte; }
 
 {ID}     	{ return T_id; }
-{D}+    	{ return T_const; }
+{D}+    	{ yylval.int_val = atoi(yytext); return T_int_const; }
 {W}+    	{ /* Do nothing */ }
 
+{CONST_CHAR}    {
+					/* 
+						2 cases : 
+					1. A character or digit etc.
+					2. An escape sequence 
+					*/
+					char const_char = getConstChar(yytext);
+					if(const_char == '\0') {
+						fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], num_lines); 
+					}
+    			    yylval.char_val = const_char;	
+					printf("Char val = %c\n", const_char);				
+					return T_char_const;
+				}
+
+{CONST_STR}     {  yylval.string_val = yytext; return T_string_literal; }
+
+{REL_OPS}      	{ yylval.string_val = yytext;  return T_rel_op; }
+{LOG_OPS}      	{ yylval.char_val = yytext[0]; return yytext[0]; }
+{MATH_OPS}      { yylval.char_val = yytext[0]; return yytext[0]; }
+{SEPARATORS}    { return yytext[0]; }
+
 \n 			{ ++num_lines; }
+{L_COMMENT}  { printf("Line Comment on line %d\n",++num_lines);}
+{ML_COMMENT} {
+                int i = 0;
+                while(yytext[i] != '\0') {
+                    char c = yytext[i];
+                    if (c == '\n') {
+                        ++num_lines;
+                    }
+                    if (c == ')' && yytext[i-1] == '*') {
+                        printf("End of Comment on line %d\n", num_lines);
+                        break;
+                    }
+                    i++;
+                }
+                return 1000;
+            }
 .   		{ fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], num_lines); }
 
 %%
+char getConstChar(const char *c) {
+	char ch;
+	int result = 1;
+	int n = strlen(c);
+    if(n == 3) {
+        ch = c[1];
+    } else if (n == 4) {
+        result = sscanf(c,  "\'\\%s\'", &ch);
+        switch(ch) {
+            case 'n':
+                ch = '\n';
+                break;
+            case 't':
+                ch = '\t';
+                break;
+            case 'r':
+                ch = '\r';
+                break;
+            case '0':
+                ch = '\0';
+                break;
+            case '\\':
+                ch = '\\';
+                break;
+            case '\'':
+                ch = '\'';
+                break;
+            case '\"':
+                ch = '\"';
+                break;
+        }
+    } else if (n == 6) {
+        result = sscanf(c,  "'\\x%hhx'", &ch);
+    }
+	return result == 1 ? ch : '\0';
+}
 
 int main() {
     int token;

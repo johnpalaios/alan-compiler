@@ -1,0 +1,537 @@
+Terminals unused in grammar
+
+    "proc"
+    "while"
+    "true"
+    "false"
+    "return"
+    "reference"
+    "int"
+    "byte"
+    T_char_const
+    T_string_literal
+    T_rel_op
+    T_log_op
+    '!'
+
+
+State 34 conflicts: 1 shift/reduce
+
+
+Grammar
+
+    0 $accept: program $end
+
+    1 program: stmt_list
+
+    2 stmt_list: %empty
+    3          | stmt_list stmt
+
+    4 stmt: "begin" stmt_list "end"
+    5     | "for" expr "do" stmt
+    6     | "if" expr "then" stmt
+    7     | "if" expr "then" stmt "else" stmt
+    8     | "let" T_id '=' expr
+    9     | "print" expr
+
+   10 expr: T_int_const
+   11     | T_id
+   12     | '(' expr ')'
+   13     | expr '+' expr
+   14     | expr '-' expr
+   15     | expr '*' expr
+   16     | expr '/' expr
+   17     | expr '%' expr
+
+
+Terminals, with rules where they appear
+
+    $end (0) 0
+    '!' (33)
+    '%' (37) 17
+    '(' (40) 12
+    ')' (41) 12
+    '*' (42) 15
+    '+' (43) 13
+    '-' (45) 14
+    '/' (47) 16
+    '=' (61) 8
+    error (256)
+    "proc" (258)
+    "if" (259) 6 7
+    "else" (260) 7
+    "while" (261)
+    "true" (262)
+    "false" (263)
+    "return" (264)
+    "reference" (265)
+    "int" (266)
+    "byte" (267)
+    T_int_const (268) 10
+    T_char_const (269)
+    T_string_literal (270)
+    T_id (271) 8 11
+    T_rel_op <string_val> (272)
+    T_log_op <char_val> (273)
+    "begin" (274) 4
+    "end" (275) 4
+    "for" (276) 5
+    "do" (277) 5
+    "then" (278) 6 7
+    "let" (279) 8
+    "print" (280) 9
+
+
+Nonterminals, with rules where they appear
+
+    $accept (35)
+        on left: 0
+    program (36)
+        on left: 1
+        on right: 0
+    stmt_list (37)
+        on left: 2 3
+        on right: 1 3 4
+    stmt (38)
+        on left: 4 5 6 7 8 9
+        on right: 3 5 6 7
+    expr (39)
+        on left: 10 11 12 13 14 15 16 17
+        on right: 5 6 7 8 9 12 13 14 15 16 17
+
+
+State 0
+
+    0 $accept: . program $end
+
+    $default  reduce using rule 2 (stmt_list)
+
+    program    go to state 1
+    stmt_list  go to state 2
+
+
+State 1
+
+    0 $accept: program . $end
+
+    $end  shift, and go to state 3
+
+
+State 2
+
+    1 program: stmt_list .
+    3 stmt_list: stmt_list . stmt
+
+    "if"     shift, and go to state 4
+    "begin"  shift, and go to state 5
+    "for"    shift, and go to state 6
+    "let"    shift, and go to state 7
+    "print"  shift, and go to state 8
+
+    $default  reduce using rule 1 (program)
+
+    stmt  go to state 9
+
+
+State 3
+
+    0 $accept: program $end .
+
+    $default  accept
+
+
+State 4
+
+    6 stmt: "if" . expr "then" stmt
+    7     | "if" . expr "then" stmt "else" stmt
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 13
+
+
+State 5
+
+    4 stmt: "begin" . stmt_list "end"
+
+    $default  reduce using rule 2 (stmt_list)
+
+    stmt_list  go to state 14
+
+
+State 6
+
+    5 stmt: "for" . expr "do" stmt
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 15
+
+
+State 7
+
+    8 stmt: "let" . T_id '=' expr
+
+    T_id  shift, and go to state 16
+
+
+State 8
+
+    9 stmt: "print" . expr
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 17
+
+
+State 9
+
+    3 stmt_list: stmt_list stmt .
+
+    $default  reduce using rule 3 (stmt_list)
+
+
+State 10
+
+   10 expr: T_int_const .
+
+    $default  reduce using rule 10 (expr)
+
+
+State 11
+
+   11 expr: T_id .
+
+    $default  reduce using rule 11 (expr)
+
+
+State 12
+
+   12 expr: '(' . expr ')'
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 18
+
+
+State 13
+
+    6 stmt: "if" expr . "then" stmt
+    7     | "if" expr . "then" stmt "else" stmt
+   13 expr: expr . '+' expr
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+
+    '+'     shift, and go to state 19
+    '-'     shift, and go to state 20
+    '*'     shift, and go to state 21
+    '/'     shift, and go to state 22
+    '%'     shift, and go to state 23
+    "then"  shift, and go to state 24
+
+
+State 14
+
+    3 stmt_list: stmt_list . stmt
+    4 stmt: "begin" stmt_list . "end"
+
+    "if"     shift, and go to state 4
+    "begin"  shift, and go to state 5
+    "end"    shift, and go to state 25
+    "for"    shift, and go to state 6
+    "let"    shift, and go to state 7
+    "print"  shift, and go to state 8
+
+    stmt  go to state 9
+
+
+State 15
+
+    5 stmt: "for" expr . "do" stmt
+   13 expr: expr . '+' expr
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+
+    '+'   shift, and go to state 19
+    '-'   shift, and go to state 20
+    '*'   shift, and go to state 21
+    '/'   shift, and go to state 22
+    '%'   shift, and go to state 23
+    "do"  shift, and go to state 26
+
+
+State 16
+
+    8 stmt: "let" T_id . '=' expr
+
+    '='  shift, and go to state 27
+
+
+State 17
+
+    9 stmt: "print" expr .
+   13 expr: expr . '+' expr
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+
+    '+'  shift, and go to state 19
+    '-'  shift, and go to state 20
+    '*'  shift, and go to state 21
+    '/'  shift, and go to state 22
+    '%'  shift, and go to state 23
+
+    $default  reduce using rule 9 (stmt)
+
+
+State 18
+
+   12 expr: '(' expr . ')'
+   13     | expr . '+' expr
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+
+    '+'  shift, and go to state 19
+    '-'  shift, and go to state 20
+    '*'  shift, and go to state 21
+    '/'  shift, and go to state 22
+    '%'  shift, and go to state 23
+    ')'  shift, and go to state 28
+
+
+State 19
+
+   13 expr: expr '+' . expr
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 29
+
+
+State 20
+
+   14 expr: expr '-' . expr
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 30
+
+
+State 21
+
+   15 expr: expr '*' . expr
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 31
+
+
+State 22
+
+   16 expr: expr '/' . expr
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 32
+
+
+State 23
+
+   17 expr: expr '%' . expr
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 33
+
+
+State 24
+
+    6 stmt: "if" expr "then" . stmt
+    7     | "if" expr "then" . stmt "else" stmt
+
+    "if"     shift, and go to state 4
+    "begin"  shift, and go to state 5
+    "for"    shift, and go to state 6
+    "let"    shift, and go to state 7
+    "print"  shift, and go to state 8
+
+    stmt  go to state 34
+
+
+State 25
+
+    4 stmt: "begin" stmt_list "end" .
+
+    $default  reduce using rule 4 (stmt)
+
+
+State 26
+
+    5 stmt: "for" expr "do" . stmt
+
+    "if"     shift, and go to state 4
+    "begin"  shift, and go to state 5
+    "for"    shift, and go to state 6
+    "let"    shift, and go to state 7
+    "print"  shift, and go to state 8
+
+    stmt  go to state 35
+
+
+State 27
+
+    8 stmt: "let" T_id '=' . expr
+
+    T_int_const  shift, and go to state 10
+    T_id         shift, and go to state 11
+    '('          shift, and go to state 12
+
+    expr  go to state 36
+
+
+State 28
+
+   12 expr: '(' expr ')' .
+
+    $default  reduce using rule 12 (expr)
+
+
+State 29
+
+   13 expr: expr . '+' expr
+   13     | expr '+' expr .
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+
+    $default  reduce using rule 13 (expr)
+
+
+State 30
+
+   13 expr: expr . '+' expr
+   14     | expr . '-' expr
+   14     | expr '-' expr .
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+
+    $default  reduce using rule 14 (expr)
+
+
+State 31
+
+   13 expr: expr . '+' expr
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   15     | expr '*' expr .
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+
+    $default  reduce using rule 15 (expr)
+
+
+State 32
+
+   13 expr: expr . '+' expr
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   16     | expr '/' expr .
+   17     | expr . '%' expr
+
+    $default  reduce using rule 16 (expr)
+
+
+State 33
+
+   13 expr: expr . '+' expr
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+   17     | expr '%' expr .
+
+    $default  reduce using rule 17 (expr)
+
+
+State 34
+
+    6 stmt: "if" expr "then" stmt .
+    7     | "if" expr "then" stmt . "else" stmt
+
+    "else"  shift, and go to state 37
+
+    "else"    [reduce using rule 6 (stmt)]
+    $default  reduce using rule 6 (stmt)
+
+
+State 35
+
+    5 stmt: "for" expr "do" stmt .
+
+    $default  reduce using rule 5 (stmt)
+
+
+State 36
+
+    8 stmt: "let" T_id '=' expr .
+   13 expr: expr . '+' expr
+   14     | expr . '-' expr
+   15     | expr . '*' expr
+   16     | expr . '/' expr
+   17     | expr . '%' expr
+
+    '+'  shift, and go to state 19
+    '-'  shift, and go to state 20
+    '*'  shift, and go to state 21
+    '/'  shift, and go to state 22
+    '%'  shift, and go to state 23
+
+    $default  reduce using rule 8 (stmt)
+
+
+State 37
+
+    7 stmt: "if" expr "then" stmt "else" . stmt
+
+    "if"     shift, and go to state 4
+    "begin"  shift, and go to state 5
+    "for"    shift, and go to state 6
+    "let"    shift, and go to state 7
+    "print"  shift, and go to state 8
+
+    stmt  go to state 38
+
+
+State 38
+
+    7 stmt: "if" expr "then" stmt "else" stmt .
+
+    $default  reduce using rule 7 (stmt)

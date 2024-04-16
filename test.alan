@@ -1,5 +1,6 @@
-+ -- This is a comment
-- (*
-  112 
-== 
-else *)
+'\x2a'
+'\n'
+'\t'
+'aia'
+'b'
+'\"'
