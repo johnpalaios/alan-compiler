@@ -5,7 +5,9 @@
 #define T_eof 0
 
 int num_lines = 0;
-
+int MAX_STR_CONST = 10000;
+void throw_err(const char *error_msg, int line_num, char *err_str);
+char *string_buf_ptr;
 %}
 
 
@@ -17,6 +19,7 @@ W [ \t\r]
 CONST_ES_CHAR \'[ -~^\\"']\'
 CONST_CHAR \'(\\([tnr0'"]|[x][0-9a-d][0-9a-d]|\\)|[ -~^\\"'])\'
 CONST_STR \"[^\n]+\"
+HEX_VALUE [0-9a-f]{2}
 
 MATH_OPS "="|"+"|"-"|"*"|"/"|"%"
 REL_OPS "=="|"!="|">"|"<"|">="|"<="
@@ -24,8 +27,12 @@ LOG_OPS "&"|"|"|"!"
 SEPARATORS "("|")"|"["|"]"|"{"|"}"|","|":"|";"
 L_COMMENT "--".*\n
 ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
-%option noyywrap
 
+%option noyywrap
+%option yylineno
+
+%x str
+%x str_esc_seq
 %%
 
 "proc"		{ return T_proc; }
@@ -60,7 +67,36 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 					return T_char_const;
 				}
 
-{CONST_STR}     {  yylval.string_val = yytext; return T_string_literal; }
+\"				{ 	/* Starting string quote */	
+					char str_buf[MAX_STR_CONST];
+					string_buf_ptr = str_buf;
+					yylval.string_val = str_buf; 
+				 	BEGIN(str);	
+				}
+<str>\"			{	/* Final string quote */
+					*string_buf_ptr = '\0';
+					BEGIN(INITIAL); 
+					printf("yylval.string_val : %s|\n", yylval.string_val); 
+					return T_string_lit; }
+
+<str>\n			{   throw_err("New line char detected on string", yylineno, "\\n"); }	
+<str>\\			{ 	BEGIN(str_esc_seq); /* Backslash detected */ }
+<str>[^\\\"\n]+ {	BEGIN(str);
+					char *yptr = yytext;
+            		while ( *yptr )
+                    	*string_buf_ptr++ = *yptr++;
+            	}  
+
+
+
+<str_esc_seq>n 				{   *string_buf_ptr++ = '\n'; BEGIN(str); }
+<str_esc_seq>t 				{   *string_buf_ptr++ = '\t'; BEGIN(str); }
+<str_esc_seq>r 				{   *string_buf_ptr++ = '\r'; BEGIN(str); }
+<str_esc_seq>\\ 			{   *string_buf_ptr++ = '\\'; BEGIN(str); }
+<str_esc_seq>\' 			{   *string_buf_ptr++ = '\''; BEGIN(str); }
+<str_esc_seq>\" 			{   *string_buf_ptr++ = '\"'; BEGIN(str); }
+<str_esc_seq>x{HEX_VALUE} 	{   char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
+								*string_buf_ptr++ = hex_ch; BEGIN(str); }
 
 {REL_OPS}      	{ yylval.string_val = yytext;  return T_rel_op; }
 {LOG_OPS}      	{ yylval.char_val = yytext[0]; return yytext[0]; }
@@ -87,6 +123,7 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 .   		{ fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], num_lines); }
 
 %%
+// {CONST_STR}     {  printf("ehey!\n");yylval.string_val = yytext; return T_string_lit; }
 char getConstChar(const char *c) {
 	char ch;
 	int result = 1;
@@ -122,6 +159,12 @@ char getConstChar(const char *c) {
         result = sscanf(c,  "'\\x%hhx'", &ch);
     }
 	return result == 1 ? ch : '\0';
+}
+
+
+void throw_err(const char *error_msg, int line_num, char *err_str) {
+	fprintf(stderr, "Flex Error : '%s' at line %d and char '%s'.\n", error_msg, line_num, err_str);
+	exit(1);
 }
 
 int main() {

@@ -132,7 +132,7 @@ extern int yydebug;
     T_byte = 267,
     T_int_const = 268,
     T_char_const = 269,
-    T_string_literal = 270,
+    T_string_lit = 270,
     T_id = 271,
     T_rel_op = 272,
     T_log_op = 273
@@ -539,7 +539,7 @@ static const char *const yytname[] =
 {
   "$end", "error", "$undefined", "\"proc\"", "\"if\"", "\"else\"",
   "\"while\"", "\"true\"", "\"false\"", "\"return\"", "\"reference\"",
-  "\"int\"", "\"byte\"", "T_int_const", "T_char_const", "T_string_literal",
+  "\"int\"", "\"byte\"", "T_int_const", "T_char_const", "T_string_lit",
   "T_id", "T_rel_op", "T_log_op", "'!'", "'+'", "'-'", "'*'", "'/'", "'%'",
   "\"begin\"", "\"end\"", "\"for\"", "\"do\"", "\"then\"", "\"let\"",
   "'='", "\"print\"", "'('", "')'", "$accept", "program", "stmt_list",

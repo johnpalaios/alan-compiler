@@ -22,7 +22,7 @@
 
 %token T_int_const
 %token T_char_const
-%token T_string_literal
+%token T_string_lit
 %token T_id
 
 %token<string_val> T_rel_op 

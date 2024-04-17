@@ -61,7 +61,7 @@ extern int yydebug;
     T_byte = 267,
     T_int_const = 268,
     T_char_const = 269,
-    T_string_literal = 270,
+    T_string_lit = 270,
     T_id = 271,
     T_rel_op = 272,
     T_log_op = 273

@@ -9,7 +9,7 @@ Terminals unused in grammar
     "int"
     "byte"
     T_char_const
-    T_string_literal
+    T_string_lit
     T_rel_op
     T_log_op
     '!'
@@ -69,7 +69,7 @@ Terminals, with rules where they appear
     "byte" (267)
     T_int_const (268) 10
     T_char_const (269)
-    T_string_literal (270)
+    T_string_lit (270)
     T_id (271) 8 11
     T_rel_op <string_val> (272)
     T_log_op <char_val> (273)
