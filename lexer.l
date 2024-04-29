@@ -31,6 +31,9 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 %option noyywrap
 %option yylineno
 
+%x chr
+%x chr_esc_seq
+
 %x str
 %x str_esc_seq
 %%
@@ -51,21 +54,24 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 {ID}     	{ return T_id; }
 {D}+    	{ yylval.int_val = atoi(yytext); return T_int_const; }
 {W}+    	{ /* Do nothing */ }
+				
+\' 			{ 	/* Starting char quote */
+				BEGIN(chr);
+			}
+<chr>[^\\\']\' {	yylval.char_val = yytext[0]; return T_char_const; }
+<chr>\\ 	{	BEGIN(chr_esc_seq);	}
+<chr>.		{ 	throw_err("Single Quotes with more than one character", yylineno, yytext); }
 
-{CONST_CHAR}    {
-					/* 
-						2 cases : 
-					1. A character or digit etc.
-					2. An escape sequence 
-					*/
-					char const_char = getConstChar(yytext);
-					if(const_char == '\0') {
-						fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], num_lines); 
-					}
-    			    yylval.char_val = const_char;	
-					printf("Char val = %c\n", const_char);				
-					return T_char_const;
-				}
+<chr_esc_seq>n\'	{   yylval.char_val ='\n'; return T_char_const; }
+<chr_esc_seq>t\'	{   yylval.char_val ='\t'; return T_char_const; }
+<chr_esc_seq>r\'	{   yylval.char_val ='\r'; return T_char_const; }
+<chr_esc_seq>0\'	{   yylval.char_val ='\0'; return T_char_const; }
+<chr_esc_seq>\\\'	{   yylval.char_val ='\\'; return T_char_const; }
+<chr_esc_seq>\'\'	{   yylval.char_val ='\''; return T_char_const; }
+<chr_esc_seq>\"\'	{   yylval.char_val ='\"'; return T_char_const; }					   	  
+<chr_esc_seq>x{HEX_VALUE}\' {   char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
+                                yylval.char_val = hex_ch; return T_char_const; }
+<chr_esc_seq>.	{ 	throw_err("Single Quotes with more than one character", yylineno, yytext); }
 
 \"				{ 	/* Starting string quote */	
 					char str_buf[MAX_STR_CONST];
@@ -79,7 +85,7 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 					printf("yylval.string_val : %s|\n", yylval.string_val); 
 					return T_string_lit; }
 
-<str>\n			{   throw_err("New line char detected on string", yylineno, "\\n"); }	
+<str>\n			{   throw_err("New line character detected on string", yylineno, "\\n"); }	
 <str>\\			{ 	BEGIN(str_esc_seq); /* Backslash detected */ }
 <str>[^\\\"\n]+ {	BEGIN(str);
 					char *yptr = yytext;

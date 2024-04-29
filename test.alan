@@ -3,3 +3,9 @@
 "Terst\rSrtring"
 "2a\x2aString"
 "Hello\\World"
+'e'
+'e\n'
+'\n'
+'\\'
+'\t'
+'\r'
