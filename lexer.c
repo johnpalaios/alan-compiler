@@ -943,7 +943,7 @@ case 15:
 /* rule 15 can match eol */
 YY_RULE_SETUP
 #line 61 "lexer.l"
-{	yylval.char_val = yytext[0]; return T_char_const; }
+{	BEGIN(INITIAL); yylval.char_val = yytext[0]; return T_char_const; }
 	YY_BREAK
 case 16:
 YY_RULE_SETUP
@@ -993,7 +993,7 @@ YY_RULE_SETUP
 case 25:
 YY_RULE_SETUP
 #line 72 "lexer.l"
-{   char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
+{   BEGIN(INITIAL); char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
                                 yylval.char_val = hex_ch; return T_char_const; }
 	YY_BREAK
 case 26:

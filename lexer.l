@@ -58,7 +58,7 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 \' 			{ 	/* Starting char quote */
 				BEGIN(chr);
 			}
-<chr>[^\\\']\' {	yylval.char_val = yytext[0]; return T_char_const; }
+<chr>[^\\\']\' {	BEGIN(INITIAL); yylval.char_val = yytext[0]; return T_char_const; }
 <chr>\\ 	{	BEGIN(chr_esc_seq);	}
 <chr>.		{ 	throw_err("Single Quotes with more than one character", yylineno, yytext); }
 
@@ -69,7 +69,7 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 <chr_esc_seq>\\\'	{   BEGIN(INITIAL); yylval.char_val ='\\'; return T_char_const; }
 <chr_esc_seq>\'\'	{   BEGIN(INITIAL); yylval.char_val ='\''; return T_char_const; }
 <chr_esc_seq>\"\'	{   BEGIN(INITIAL); yylval.char_val ='\"'; return T_char_const; }					   	  
-<chr_esc_seq>x{HEX_VALUE}\' {   char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
+<chr_esc_seq>x{HEX_VALUE}\' {   BEGIN(INITIAL); char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
                                 yylval.char_val = hex_ch; return T_char_const; }
 
 <chr_esc_seq>.	{ 	throw_err("Single Quotes with more than one character", yylineno, yytext); }
