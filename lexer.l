@@ -62,15 +62,16 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 <chr>\\ 	{	BEGIN(chr_esc_seq);	}
 <chr>.		{ 	throw_err("Single Quotes with more than one character", yylineno, yytext); }
 
-<chr_esc_seq>n\'	{   yylval.char_val ='\n'; return T_char_const; }
-<chr_esc_seq>t\'	{   yylval.char_val ='\t'; return T_char_const; }
-<chr_esc_seq>r\'	{   yylval.char_val ='\r'; return T_char_const; }
-<chr_esc_seq>0\'	{   yylval.char_val ='\0'; return T_char_const; }
-<chr_esc_seq>\\\'	{   yylval.char_val ='\\'; return T_char_const; }
-<chr_esc_seq>\'\'	{   yylval.char_val ='\''; return T_char_const; }
-<chr_esc_seq>\"\'	{   yylval.char_val ='\"'; return T_char_const; }					   	  
+<chr_esc_seq>n\'	{   BEGIN(INITIAL); yylval.char_val ='\n'; return T_char_const; }
+<chr_esc_seq>t\'	{   BEGIN(INITIAL); yylval.char_val ='\t'; return T_char_const; }
+<chr_esc_seq>r\'	{   BEGIN(INITIAL); yylval.char_val ='\r'; return T_char_const; }
+<chr_esc_seq>0\'	{   BEGIN(INITIAL); yylval.char_val ='\0'; return T_char_const; }
+<chr_esc_seq>\\\'	{   BEGIN(INITIAL); yylval.char_val ='\\'; return T_char_const; }
+<chr_esc_seq>\'\'	{   BEGIN(INITIAL); yylval.char_val ='\''; return T_char_const; }
+<chr_esc_seq>\"\'	{   BEGIN(INITIAL); yylval.char_val ='\"'; return T_char_const; }					   	  
 <chr_esc_seq>x{HEX_VALUE}\' {   char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
                                 yylval.char_val = hex_ch; return T_char_const; }
+
 <chr_esc_seq>.	{ 	throw_err("Single Quotes with more than one character", yylineno, yytext); }
 
 \"				{ 	/* Starting string quote */	
@@ -82,7 +83,7 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 <str>\"			{	/* Final string quote */
 					*string_buf_ptr = '\0';
 					BEGIN(INITIAL); 
-					printf("yylval.string_val : %s|\n", yylval.string_val); 
+					//printf("yylval.string_val : %s|\n", yylval.string_val); 
 					return T_string_lit; }
 
 <str>\n			{   throw_err("New line character detected on string", yylineno, "\\n"); }	
@@ -177,8 +178,14 @@ int main() {
     int token;
     do {
         token = yylex();
-        printf("token = %d, lexeme = %s\n", token, yytext);
-    } while(token != T_eof);
+    	if(token == T_string_lit) {
+			printf("yylval.string_val : \"%s\"\n", yylval.string_val);
+		} else if(token == T_char_const) {
+			printf("yylval.char_val : \'%c\'\n", yylval.char_val);
+		} else {
+        	printf("token = %d, lexeme = %s\n", token, yytext);
+		} 
+	} while(token != T_eof);
     return 0;
 }
 

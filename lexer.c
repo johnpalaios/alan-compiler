@@ -958,37 +958,37 @@ YY_RULE_SETUP
 case 18:
 YY_RULE_SETUP
 #line 65 "lexer.l"
-{   yylval.char_val ='\n'; return T_char_const; }
+{   BEGIN(INITIAL); yylval.char_val ='\n'; return T_char_const; }
 	YY_BREAK
 case 19:
 YY_RULE_SETUP
 #line 66 "lexer.l"
-{   yylval.char_val ='\t'; return T_char_const; }
+{   BEGIN(INITIAL); yylval.char_val ='\t'; return T_char_const; }
 	YY_BREAK
 case 20:
 YY_RULE_SETUP
 #line 67 "lexer.l"
-{   yylval.char_val ='\r'; return T_char_const; }
+{   BEGIN(INITIAL); yylval.char_val ='\r'; return T_char_const; }
 	YY_BREAK
 case 21:
 YY_RULE_SETUP
 #line 68 "lexer.l"
-{   yylval.char_val ='\0'; return T_char_const; }
+{   BEGIN(INITIAL); yylval.char_val ='\0'; return T_char_const; }
 	YY_BREAK
 case 22:
 YY_RULE_SETUP
 #line 69 "lexer.l"
-{   yylval.char_val ='\\'; return T_char_const; }
+{   BEGIN(INITIAL); yylval.char_val ='\\'; return T_char_const; }
 	YY_BREAK
 case 23:
 YY_RULE_SETUP
 #line 70 "lexer.l"
-{   yylval.char_val ='\''; return T_char_const; }
+{   BEGIN(INITIAL); yylval.char_val ='\''; return T_char_const; }
 	YY_BREAK
 case 24:
 YY_RULE_SETUP
 #line 71 "lexer.l"
-{   yylval.char_val ='\"'; return T_char_const; }					   	  
+{   BEGIN(INITIAL); yylval.char_val ='\"'; return T_char_const; }					   	  
 	YY_BREAK
 case 25:
 YY_RULE_SETUP
@@ -998,12 +998,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 26:
 YY_RULE_SETUP
-#line 74 "lexer.l"
+#line 75 "lexer.l"
 { 	throw_err("Single Quotes with more than one character", yylineno, yytext); }
 	YY_BREAK
 case 27:
 YY_RULE_SETUP
-#line 76 "lexer.l"
+#line 77 "lexer.l"
 { 	/* Starting string quote */	
 					char str_buf[MAX_STR_CONST];
 					string_buf_ptr = str_buf;
@@ -1013,27 +1013,27 @@ YY_RULE_SETUP
 	YY_BREAK
 case 28:
 YY_RULE_SETUP
-#line 82 "lexer.l"
+#line 83 "lexer.l"
 {	/* Final string quote */
 					*string_buf_ptr = '\0';
 					BEGIN(INITIAL); 
-					printf("yylval.string_val : %s|\n", yylval.string_val); 
+					//printf("yylval.string_val : %s|\n", yylval.string_val); 
 					return T_string_lit; }
 	YY_BREAK
 case 29:
 /* rule 29 can match eol */
 YY_RULE_SETUP
-#line 88 "lexer.l"
+#line 89 "lexer.l"
 {   throw_err("New line character detected on string", yylineno, "\\n"); }	
 	YY_BREAK
 case 30:
 YY_RULE_SETUP
-#line 89 "lexer.l"
+#line 90 "lexer.l"
 { 	BEGIN(str_esc_seq); /* Backslash detected */ }
 	YY_BREAK
 case 31:
 YY_RULE_SETUP
-#line 90 "lexer.l"
+#line 91 "lexer.l"
 {	BEGIN(str);
 					char *yptr = yytext;
             		while ( *yptr )
@@ -1042,76 +1042,76 @@ YY_RULE_SETUP
 	YY_BREAK
 case 32:
 YY_RULE_SETUP
-#line 98 "lexer.l"
+#line 99 "lexer.l"
 {   *string_buf_ptr++ = '\n'; BEGIN(str); }
 	YY_BREAK
 case 33:
 YY_RULE_SETUP
-#line 99 "lexer.l"
+#line 100 "lexer.l"
 {   *string_buf_ptr++ = '\t'; BEGIN(str); }
 	YY_BREAK
 case 34:
 YY_RULE_SETUP
-#line 100 "lexer.l"
+#line 101 "lexer.l"
 {   *string_buf_ptr++ = '\r'; BEGIN(str); }
 	YY_BREAK
 case 35:
 YY_RULE_SETUP
-#line 101 "lexer.l"
+#line 102 "lexer.l"
 {   *string_buf_ptr++ = '\\'; BEGIN(str); }
 	YY_BREAK
 case 36:
 YY_RULE_SETUP
-#line 102 "lexer.l"
+#line 103 "lexer.l"
 {   *string_buf_ptr++ = '\''; BEGIN(str); }
 	YY_BREAK
 case 37:
 YY_RULE_SETUP
-#line 103 "lexer.l"
+#line 104 "lexer.l"
 {   *string_buf_ptr++ = '\"'; BEGIN(str); }
 	YY_BREAK
 case 38:
 YY_RULE_SETUP
-#line 104 "lexer.l"
+#line 105 "lexer.l"
 {   char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
 								*string_buf_ptr++ = hex_ch; BEGIN(str); }
 	YY_BREAK
 case 39:
 YY_RULE_SETUP
-#line 107 "lexer.l"
+#line 108 "lexer.l"
 { yylval.string_val = yytext;  return T_rel_op; }
 	YY_BREAK
 case 40:
 YY_RULE_SETUP
-#line 108 "lexer.l"
+#line 109 "lexer.l"
 { yylval.char_val = yytext[0]; return yytext[0]; }
 	YY_BREAK
 case 41:
 YY_RULE_SETUP
-#line 109 "lexer.l"
+#line 110 "lexer.l"
 { yylval.char_val = yytext[0]; return yytext[0]; }
 	YY_BREAK
 case 42:
 YY_RULE_SETUP
-#line 110 "lexer.l"
+#line 111 "lexer.l"
 { return yytext[0]; }
 	YY_BREAK
 case 43:
 /* rule 43 can match eol */
 YY_RULE_SETUP
-#line 112 "lexer.l"
+#line 113 "lexer.l"
 { ++num_lines; }
 	YY_BREAK
 case 44:
 /* rule 44 can match eol */
 YY_RULE_SETUP
-#line 113 "lexer.l"
+#line 114 "lexer.l"
 { printf("Line Comment on line %d\n",++num_lines);}
 	YY_BREAK
 case 45:
 /* rule 45 can match eol */
 YY_RULE_SETUP
-#line 114 "lexer.l"
+#line 115 "lexer.l"
 {
                 int i = 0;
                 while(yytext[i] != '\0') {
@@ -1130,12 +1130,12 @@ YY_RULE_SETUP
 	YY_BREAK
 case 46:
 YY_RULE_SETUP
-#line 129 "lexer.l"
+#line 130 "lexer.l"
 { fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], num_lines); }
 	YY_BREAK
 case 47:
 YY_RULE_SETUP
-#line 131 "lexer.l"
+#line 132 "lexer.l"
 YY_FATAL_ERROR( "flex scanner jammed" );
 	YY_BREAK
 #line 1142 "lexer.c"
@@ -2159,7 +2159,7 @@ void yyfree (void * ptr )
 
 #define YYTABLES_NAME "yytables"
 
-#line 131 "lexer.l"
+#line 132 "lexer.l"
 
 // {CONST_STR}     {  printf("ehey!\n");yylval.string_val = yytext; return T_string_lit; }
 char getConstChar(const char *c) {
@@ -2209,8 +2209,14 @@ int main() {
     int token;
     do {
         token = yylex();
-        printf("token = %d, lexeme = %s\n", token, yytext);
-    } while(token != T_eof);
+    	if(token == T_string_lit) {
+			printf("yylval.string_val : \"%s\"\n", yylval.string_val);
+		} else if(token == T_char_const) {
+			printf("yylval.char_val : \'%c\'\n", yylval.char_val);
+		} else {
+        	printf("token = %d, lexeme = %s\n", token, yytext);
+		} 
+	} while(token != T_eof);
     return 0;
 }
 

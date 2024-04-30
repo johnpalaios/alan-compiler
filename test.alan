@@ -1,11 +1,6 @@
-"This is a test String\n"
-"Test\tString"
-"Terst\rSrtring"
-"2a\x2aString"
-"Hello\\World"
-'e'
-'e\n'
-'\n'
 '\\'
+'\n'
 '\t'
-'\r'
+'\"'
+'\''
+
