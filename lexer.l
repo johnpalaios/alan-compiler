@@ -55,9 +55,7 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 {D}+    	{ yylval.int_val = atoi(yytext); return T_int_const; }
 {W}+    	{ /* Do nothing */ }
 				
-\' 			{ 	/* Starting char quote */
-				BEGIN(chr);
-			}
+\' 			{ 	/* Starting char quote */	BEGIN(chr); }
 <chr>[^\\\']\' {	BEGIN(INITIAL); yylval.char_val = yytext[0]; return T_char_const; }
 <chr>\\ 	{	BEGIN(chr_esc_seq);	}
 <chr>.		{ 	throw_err("Single Quotes with more than one character", yylineno, yytext); }
@@ -95,7 +93,6 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
             	}  
 
 
-
 <str_esc_seq>n 				{   *string_buf_ptr++ = '\n'; BEGIN(str); }
 <str_esc_seq>t 				{   *string_buf_ptr++ = '\t'; BEGIN(str); }
 <str_esc_seq>r 				{   *string_buf_ptr++ = '\r'; BEGIN(str); }
@@ -104,16 +101,16 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
 <str_esc_seq>\" 			{   *string_buf_ptr++ = '\"'; BEGIN(str); }
 <str_esc_seq>x{HEX_VALUE} 	{   char hex_ch; sscanf(yytext,  "x%hhx", &hex_ch);
 								*string_buf_ptr++ = hex_ch; BEGIN(str); }
+<str_esc_seq>.				{ 	throw_err("Not known escape sequence", yylineno, yytext); }
 
 {REL_OPS}      	{ yylval.string_val = yytext;  return T_rel_op; }
 {LOG_OPS}      	{ yylval.char_val = yytext[0]; return yytext[0]; }
 {MATH_OPS}      { yylval.char_val = yytext[0]; return yytext[0]; }
 {SEPARATORS}    { return yytext[0]; }
 
-\n 			{ ++num_lines; }
-{L_COMMENT}  { printf("Line Comment on line %d\n",++num_lines);}
-{ML_COMMENT} {
-                int i = 0;
+\n 				{ ++num_lines; }
+{L_COMMENT}  	{ printf("Line Comment on line %d\n",++num_lines); }
+{ML_COMMENT} 	{  int i = 0;
                 while(yytext[i] != '\0') {
                     char c = yytext[i];
                     if (c == '\n') {
@@ -125,11 +122,12 @@ ML_COMMENT \(\*([^*]|\*[^)])*\*+\)
                     }
                     i++;
                 }
-                return 1000;
-            }
+                return 1000; 
+			 	}
 .   		{ fprintf(stderr, "Illegal character %c at line %d\n", yytext[0], num_lines); }
 
-%%
+%% 
+
 // {CONST_STR}     {  printf("ehey!\n");yylval.string_val = yytext; return T_string_lit; }
 char getConstChar(const char *c) {
 	char ch;
